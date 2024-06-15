@@ -61,7 +61,10 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
   log.Printf("Token: %s \n", token)
-  utils.WriteJSON(w, http.StatusOK, map[string]string{"toker": token})
+  if utils.WriteJSON(w, http.StatusOK, map[string]string{"toker": token}) != nil {
+    log.Fatal("Write JSON error")
+  }
+
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -105,5 +108,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	if utils.WriteJSON(w, http.StatusCreated, nil) != nil {
+    log.Fatal("Write JSON error")
+  }
 }

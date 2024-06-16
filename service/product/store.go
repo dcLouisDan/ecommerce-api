@@ -2,6 +2,8 @@ package product
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/dclouisDan/ecommerce-api/types"
 )
@@ -27,10 +29,47 @@ func (s *Store) GetProducts() ([]types.Product, error) {
 			return nil, err
 		}
 
-    products = append(products, *p)
+		products = append(products, *p)
 	}
 
-  return products, nil
+	return products, nil
+}
+
+func (s *Store) GetProductsByIDs(productIDs []int) ([]types.Product, error) {
+	placeholders := strings.Repeat(",?", len(productIDs)-1)
+	query := fmt.Sprintf("SELECT * FROM products WHERE id IN (?%s)", placeholders)
+
+	// Convert productIds to []interface{}
+	args := make([]interface{}, len(productIDs))
+	for i, v := range productIDs {
+		args[i] = v
+	}
+
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	products := []types.Product{}
+	for rows.Next() {
+		p, err := scanRowIntoProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		products = append(products, *p)
+	}
+
+	return products, nil
+}
+
+func (s *Store) CreateProduct(product types.Product) error {
+	_, err := s.db.Exec("INSERT INTO products(name, description, image, price, quantity) VALUES (?,?,?,?,?)", product.Name, product.Description, product.Image, product.Price, product.Quantity)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func scanRowIntoProduct(rows *sql.Rows) (*types.Product, error) {

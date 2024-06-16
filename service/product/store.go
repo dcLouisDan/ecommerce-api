@@ -64,24 +64,24 @@ func (s *Store) GetProductsByIDs(productIDs []int) ([]types.Product, error) {
 }
 
 func (s *Store) GetProductByID(productId int) (*types.Product, error) {
-  rows, err := s.db.Query("SELECT * FROM products WHERE id = ?", productId)
-  if err != nil {
-    return nil, err
-  }
-  
-  p := new(types.Product)
-  for rows.Next() {
-    p, err = scanRowIntoProduct(rows)
-    if err != nil {
-      return nil, err
-    }
-  }
+	rows, err := s.db.Query("SELECT * FROM products WHERE id = ?", productId)
+	if err != nil {
+		return nil, err
+	}
 
-  if p.ID == 0 {
-    return nil, fmt.Errorf("Product not found.")
-  }
+	p := new(types.Product)
+	for rows.Next() {
+		p, err = scanRowIntoProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
 
-  return p, nil
+	if p.ID == 0 {
+		return nil, fmt.Errorf("Product not found.")
+	}
+
+	return p, nil
 }
 
 func (s *Store) CreateProduct(product types.Product) error {
@@ -94,7 +94,11 @@ func (s *Store) CreateProduct(product types.Product) error {
 }
 
 func (s *Store) UpdateProduct(product types.Product) error {
-  return nil
+	_, err := s.db.Exec("UPDATE products SET name = ?, description = ?, image = ?, price = ?, quantity = ? WHERE id = ?", product.Name, product.Description, product.Image, product.Price, product.Quantity, product.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func scanRowIntoProduct(rows *sql.Rows) (*types.Product, error) {

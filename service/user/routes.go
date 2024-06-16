@@ -31,6 +31,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	var payload types.LoginUserPayload
 
 	if err := utils.ParseJson(r, &payload); err != nil {
+    log.Printf("Parse Error: %s", err.Error())
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
@@ -60,7 +61,6 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-  log.Printf("Token: %s \n", token)
   if utils.WriteJSON(w, http.StatusOK, map[string]string{"toker": token}) != nil {
     log.Fatal("Write JSON error")
   }

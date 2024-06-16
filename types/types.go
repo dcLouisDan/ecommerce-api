@@ -59,7 +59,7 @@ type OrderItem struct {
 }
 
 type CartCheckoutItem struct {
-  ProductId Product `json:"productId"`
+  ProductId int `json:"productId"`
   Quantity int `json:"quantity"`
 }
 
